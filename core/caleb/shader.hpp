@@ -1,10 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h>
+#include "../ew/external/glad.h"
 #include <string>
-#include <fstream>
-#include <sstream>
 #include <iostream>
 
 class Shader
@@ -12,7 +10,7 @@ class Shader
 public:
     unsigned int ID;
 
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader(const char* vertexSource, const char* fragmentSource);
 
     void use();
 

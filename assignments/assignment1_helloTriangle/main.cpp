@@ -1,10 +1,8 @@
 #include <stdio.h>
-#include <math.h>
 #include <iostream>
 
 #include <caleb/shader.hpp>
 #include <ew/external/glad.h>
-#include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -17,26 +15,26 @@ int main() {
         printf("GLFW failed to init!");
         return 1;
     }
+
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Triangle", NULL, NULL);
     if (window == NULL) {
         printf("GLFW failed to create window");
         return 1;
     }
     glfwMakeContextCurrent(window);
+
     if (!gladLoadGL(glfwGetProcAddress)) {
         printf("GLAD Failed to load GL headers");
         return 1;
     }
 
-    // Enable blending for transparency
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // Initialization
     float vertices[] = {
         -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
     unsigned int VAO, VBO;
@@ -51,11 +49,6 @@ int main() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    // Compile shaders
-    unsigned int vertexShader, fragmentShader, shaderProgram;
-    int success;
-    char infoLog[512];
 
     const char* vertexShaderSource = "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
@@ -83,36 +76,7 @@ int main() {
         "    FragColor = vec4(color, 1.0);\n"
         "}\0";
 
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader shaderProgram(vertexShaderSource, fragmentShaderSource);
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -121,11 +85,10 @@ int main() {
         glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        shaderProgram.use();
 
         float timeValue = glfwGetTime();
-        int timeLocation = glGetUniformLocation(shaderProgram, "_Time");
-        glUniform1f(timeLocation, timeValue);
+        shaderProgram.setFloat("_Time", timeValue);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -133,6 +96,8 @@ int main() {
         glfwSwapBuffers(window);
     }
 
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
     printf("Shutting down...");
     glfwTerminate();
     return 0;
