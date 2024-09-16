@@ -2,6 +2,7 @@
 #include <math.h>
 #include <iostream>
 
+#include <caleb/shader.hpp>
 #include <ew/external/glad.h>
 #include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
