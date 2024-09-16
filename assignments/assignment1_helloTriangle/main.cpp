@@ -50,33 +50,7 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "layout (location = 1) in vec3 aColor;\n"
-        "out vec3 vertexColor;\n"
-        "uniform float _Time;\n"
-        "void main()\n"
-        "{\n"
-        "    vec3 pos = aPos;\n"
-        "    pos.y += sin(_Time * 5.0 + pos.x) * 0.5;\n"
-        "    gl_Position = vec4(pos, 1.0);\n"
-        "    vertexColor = aColor;\n"
-        "}\0";
-
-    const char* fragmentShaderSource = "#version 330 core\n"
-        "in vec3 vertexColor;\n"
-        "out vec4 FragColor;\n"
-        "uniform float _Time;\n"
-        "void main()\n"
-        "{\n"
-        "    vec3 color = vertexColor;\n"
-        "    color.r = abs(sin(_Time * 2.0 + vertexColor.r * 10.0));\n"
-        "    color.g = abs(sin(_Time * 2.0 + vertexColor.g * 10.0));\n"
-        "    color.b = abs(sin(_Time * 2.0 + vertexColor.b * 10.0));\n"
-        "    FragColor = vec4(color, 1.0);\n"
-        "}\0";
-
-    Shader shaderProgram(vertexShaderSource, fragmentShaderSource);
+    Shader shaderProgram("assets/vertexShader.vert", "assets/fragmentShader.frag");
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {

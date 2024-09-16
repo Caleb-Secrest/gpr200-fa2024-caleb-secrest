@@ -3,6 +3,8 @@
 
 #include "../ew/external/glad.h"
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 
 class Shader
