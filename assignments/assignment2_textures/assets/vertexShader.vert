@@ -2,16 +2,14 @@
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
+layout (location = 2) in vec2 aTexCoord;
 
 out vec3 vertexColor;
-
-uniform float _Time;
+out vec2 TexCoord;
 
 void main()
 {
-    vec3 pos = aPos;
-    pos.y += sin(_Time * 5.0 + pos.x) * 0.5;
-
-    gl_Position = vec4(pos, 1.0);
+    gl_Position = vec4(aPos, 1.0);
     vertexColor = aColor;
+    TexCoord = vec2(aTexCoord.x, aTexCoord.y);
 }

@@ -1,16 +1,14 @@
 #version 330 core
 
-in vec3 vertexColor;
 out vec4 FragColor;
 
-uniform float _Time;
+in vec3 vertexColor;
+in vec2 TexCoord;
+
+uniform sampler2D texture1;
+uniform sampler2D texture2;
 
 void main()
 {
-    vec3 color = vertexColor;
-    color.r = abs(sin(_Time * 2.0 + vertexColor.r * 10.0));
-    color.g = abs(sin(_Time * 2.0 + vertexColor.g * 10.0));
-    color.b = abs(sin(_Time * 2.0 + vertexColor.b * 10.0));
-
-    FragColor = vec4(color, 1.0);
+    FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);
 }
