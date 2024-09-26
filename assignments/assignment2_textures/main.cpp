@@ -30,8 +30,8 @@ int main() {
         return 1;
     }
 
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float vertices[] = {
         // POSITIONS            // COLORS           // TEXTURE COORDS
@@ -71,14 +71,19 @@ int main() {
     Texture backgroundTexture1;
     Texture backgroundTexture2;
 
-    backgroundTexture1.TextureJPG("assets/pirateBackground.jpg", GL_LINEAR, GL_REPEAT);
-    backgroundTexture2.TexturePNG("assets/blood.png", GL_LINEAR, GL_REPEAT);
+    backgroundTexture1.TextureJPG("assets/checkerboard.jpg", GL_LINEAR, GL_REPEAT);
+    backgroundTexture2.TexturePNG("assets/face.png", GL_LINEAR, GL_REPEAT);
 
-    Shader shaderProgram("assets/vertexShader.vert", "assets/fragmentShader.frag");
+    Texture characterTexture;
+
+    characterTexture.TextureJPG("assets/chest.jpg", GL_NEAREST, GL_CLAMP_TO_EDGE);
+
+    Shader shaderProgram("assets/backgroundVertexShader.vert", "assets/backgroundFragmentShader.frag");
+    Shader characterShader("assets/characterVertexShader.vert", "assets/characterFragmentShader.frag");
 
     shaderProgram.use();
 
-    glUniform1i(glGetUniformLocation(shaderProgram.ID, "texture1"), 0);
+    shaderProgram.setInt("texture1", 0);
     shaderProgram.setInt("texture2", 1);
 
     // Render loop
@@ -91,12 +96,19 @@ int main() {
         shaderProgram.use();
         backgroundTexture1.Bind(0);
         backgroundTexture2.Bind(1);
-        shaderProgram.setInt("texture1", 0);
-        shaderProgram.setInt("texture2", 1);
+        shaderProgram.setFloat("tiling", 5.0f);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        float timeValue = glfwGetTime();
-        shaderProgram.setFloat("_Time", timeValue);
-
+        characterShader.use();
+        characterTexture.Bind(0);
+        characterShader.setInt("characterTexture", 0);
+        float characterPosX = 0.0f;
+        float characterPosY = 0.0f;
+        glUniform2f(glGetUniformLocation(characterShader.ID, "position"), characterPosX, characterPosY);
+        float scaleX = 2.0f;
+        float scaleY = 2.0f;
+        glUniform2f(glGetUniformLocation(characterShader.ID, "scale"), scaleX, scaleY);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
