@@ -7,9 +7,13 @@ layout (location = 2) in vec2 aTexCoord;
 out vec3 vertexColor;
 out vec2 TexCoord;
 
+uniform float _Time;
+uniform float scrollSpeed;
+uniform vec2 position;
+
 void main()
 {
     gl_Position = vec4(aPos, 1.0);
     vertexColor = aColor;
-    TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+    TexCoord = vec2(aTexCoord.x + _Time * scrollSpeed, aTexCoord.y);
 }

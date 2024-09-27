@@ -86,6 +86,12 @@ int main() {
     shaderProgram.setInt("texture1", 0);
     shaderProgram.setInt("texture2", 1);
 
+    //float scrollSpeed = 0.1f;
+    //float totalScroll = 0.0f;
+
+    //float deltaTime = 0.0f;
+    //float lastFrame = 0.0f;
+
     // Render loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -93,14 +99,21 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        float renderTime = glfwGetTime();
+        //deltaTime = renderTime - lastFrame;
+        ///lastFrame = renderTime;
+
+        //totalScroll += scrollSpeed * deltaTime;
+
         shaderProgram.use();
         backgroundTexture1.Bind(0);
         backgroundTexture2.Bind(1);
         shaderProgram.setFloat("tiling", 10.0f);
+        shaderProgram.setFloat("_Time", renderTime);
+        shaderProgram.setFloat("scrollSpeed", 0.5);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
-        float renderTime = glfwGetTime();
         characterShader.use();
         characterTexture.Bind(0);
         characterShader.setFloat("_Time", renderTime);
