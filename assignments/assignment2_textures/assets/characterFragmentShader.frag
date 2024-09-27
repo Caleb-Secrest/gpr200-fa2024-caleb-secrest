@@ -2,10 +2,12 @@
 
 out vec4 fragColor;
 
-in vec2 TexCoords;
+in vec3 vertexColor;
+in vec2 TexCoord;
 
 uniform sampler2D characterTexture;
 
 void main() {
-    fragColor = texture(characterTexture, TexCoords);
+    if (fragColor.a < 0.1) discard;
+    fragColor = texture(characterTexture, TexCoord);
 }

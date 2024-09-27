@@ -76,7 +76,7 @@ int main() {
 
     Texture characterTexture;
 
-    characterTexture.TextureJPG("assets/chest.jpg", GL_NEAREST, GL_CLAMP_TO_EDGE);
+    characterTexture.TexturePNG("assets/chest.png", GL_NEAREST, GL_CLAMP_TO_EDGE);
 
     Shader shaderProgram("assets/backgroundVertexShader.vert", "assets/backgroundFragmentShader.frag");
     Shader characterShader("assets/characterVertexShader.vert", "assets/characterFragmentShader.frag");
@@ -96,18 +96,20 @@ int main() {
         shaderProgram.use();
         backgroundTexture1.Bind(0);
         backgroundTexture2.Bind(1);
-        shaderProgram.setFloat("tiling", 5.0f);
+        shaderProgram.setFloat("tiling", 10.0f);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        float renderTime = glfwGetTime();
         characterShader.use();
         characterTexture.Bind(0);
+        characterShader.setFloat("_Time", renderTime);
         characterShader.setInt("characterTexture", 0);
         float characterPosX = 0.0f;
         float characterPosY = 0.0f;
         glUniform2f(glGetUniformLocation(characterShader.ID, "position"), characterPosX, characterPosY);
-        float scaleX = 2.0f;
-        float scaleY = 2.0f;
+        float scaleX = 0.5f;
+        float scaleY = 0.5f;
         glUniform2f(glGetUniformLocation(characterShader.ID, "scale"), scaleX, scaleY);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
