@@ -9,14 +9,16 @@ enum Camera_Movement {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP,
+	DOWN
 };
 
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
+const float ZOOM = 60.0f;
 
 class Camera {
 public:
@@ -36,7 +38,7 @@ public:
 	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
 
 	glm::mat4 GetViewMatrix();
-	void ProcessKeyboard(Camera_Movement dir, float deltaTime);
+	void ProcessKeyboard(Camera_Movement dir, float deltaTime, bool sprint);
 	void ProcessMouseMovement(float xOffSet, float yOffSet, GLboolean constrainPitch = true);
 	void ProcessMouseScroll(float yOffSet);
 

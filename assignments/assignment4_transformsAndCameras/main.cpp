@@ -155,7 +155,7 @@ int main() {
         cubeBackTexture.Bind(0);
         cubeFrontTexture.Bind(1);
 
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 1000.0f);
         shaderProgram.setMat4("projection", projection);
 
         glm::mat4 view = cam.GetViewMatrix();
@@ -185,17 +185,25 @@ int main() {
 
 void processInput(GLFWwindow* window)
 {
+    bool isSprinting = false;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        isSprinting = true;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cam.ProcessKeyboard(FORWARD, deltaTime);
+        cam.ProcessKeyboard(FORWARD, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cam.ProcessKeyboard(BACKWARD, deltaTime);
+        cam.ProcessKeyboard(BACKWARD, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cam.ProcessKeyboard(LEFT, deltaTime);
+        cam.ProcessKeyboard(LEFT, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cam.ProcessKeyboard(RIGHT, deltaTime);
+        cam.ProcessKeyboard(RIGHT, deltaTime, isSprinting);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        cam.ProcessKeyboard(UP, deltaTime, isSprinting);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        cam.ProcessKeyboard(DOWN, deltaTime, isSprinting);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
