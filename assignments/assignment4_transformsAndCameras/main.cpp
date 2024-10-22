@@ -103,7 +103,7 @@ int main() {
     float cubeRot[cubeCount];
     glm::vec3 cubeSize[cubeCount];
 
-    for (unsigned int i = 0; i < 20; i++)
+    for (unsigned int i = 0; i < cubeCount; i++)
     {
         float cubeScale = ew::RandomRange(0.25f, 3.0f);
 
@@ -124,7 +124,7 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     Texture cubeBackTexture, cubeFrontTexture;
