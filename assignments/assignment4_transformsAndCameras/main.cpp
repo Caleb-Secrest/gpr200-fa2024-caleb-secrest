@@ -6,6 +6,7 @@
 #include <caleb/camera.hpp>
 #include <ew/external/glad.h>
 #include <ew/external/stb_image.h>
+#include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -97,18 +98,19 @@ int main() {
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    glm::vec3 cubePos[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+    const int cubeCount = 20;
+    glm::vec3 cubePos[cubeCount];
+    float cubeRot[cubeCount];
+    glm::vec3 cubeSize[cubeCount];
+
+    for (unsigned int i = 0; i < 20; i++)
+    {
+        float cubeScale = ew::RandomRange(0.25f, 3.0f);
+
+        cubePos[i] = glm::vec3(ew::RandomRange(-10.0f, 10.0f), ew::RandomRange(-10.0f, 10.0f), ew::RandomRange(-10.0f, 10.0f));
+        cubeRot[i] = ew::RandomRange(0.0f, 360.0f);
+        cubeSize[i] = glm::vec3(cubeScale, cubeScale, cubeScale);
+    }
 
     unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
@@ -128,7 +130,7 @@ int main() {
     Texture cubeBackTexture, cubeFrontTexture;
 
     cubeBackTexture.TextureJPG("assets/checkerboard.jpg", GL_LINEAR, GL_REPEAT);
-    cubeFrontTexture.TextureJPG("assets/chest.png", GL_LINEAR, GL_REPEAT);
+    cubeFrontTexture.TexturePNG("assets/face.png", GL_LINEAR, GL_REPEAT);
 
     Shader shaderProgram("assets/cubeVertexShader.vert", "assets/cubeFragmentShader.frag");
 
@@ -162,12 +164,12 @@ int main() {
         shaderProgram.setMat4("view", view);
 
         glBindVertexArray(VAO);
-        for (unsigned int i = 0; i < 10; i++)
+        for (unsigned int i = 0; i < cubeCount; i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePos[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(model, glm::radians(cubeRot[i]) * currentFrame, glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::scale(model, cubeSize[i]);
             shaderProgram.setMat4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -200,9 +202,9 @@ void processInput(GLFWwindow* window)
         cam.ProcessKeyboard(LEFT, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cam.ProcessKeyboard(RIGHT, deltaTime, isSprinting);
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-        cam.ProcessKeyboard(UP, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        cam.ProcessKeyboard(UP, deltaTime, isSprinting);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         cam.ProcessKeyboard(DOWN, deltaTime, isSprinting);
 }
 
