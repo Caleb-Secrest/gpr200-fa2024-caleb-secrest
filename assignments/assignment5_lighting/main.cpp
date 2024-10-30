@@ -28,6 +28,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 int main() {
     printf("Initializing...");
     if (!glfwInit()) {
@@ -113,11 +115,11 @@ int main() {
         cubeSize[i] = glm::vec3(cubeScale, cubeScale, cubeScale);
     }
 
-    unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
+    unsigned int cubeVAO, VBO;
+    glGenVertexArrays(1, &cubeVAO);
     glGenBuffers(1, &VBO);
 
-    glBindVertexArray(VAO);
+    glBindVertexArray(cubeVAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -131,12 +133,22 @@ int main() {
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
 
+    unsigned int lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
     Texture cubeBackTexture, cubeFrontTexture;
 
     cubeBackTexture.TextureJPG("assets/checkerboard.jpg", GL_LINEAR, GL_REPEAT);
     cubeFrontTexture.TexturePNG("assets/face.png", GL_LINEAR, GL_REPEAT);
 
     Shader shaderProgram("assets/cubeVertexShader.vert", "assets/cubeFragmentShader.frag");
+    Shader lightCubeProgram("assets/lightCubeVertexShader.vert", "assets/lightCubeFragmentShader.frag");
 
     shaderProgram.use();
 
@@ -157,6 +169,9 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaderProgram.use();
+        shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        shaderProgram.setVec3("lightPos", lightPos);
+        shaderProgram.setVec3("viewPos", cam.Pos);
 
         cubeBackTexture.Bind(0);
         cubeFrontTexture.Bind(1);
@@ -167,7 +182,7 @@ int main() {
         glm::mat4 view = cam.GetViewMatrix();
         shaderProgram.setMat4("view", view);
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(cubeVAO);
         for (unsigned int i = 0; i < cubeCount; i++)
         {
             glm::mat4 model = glm::mat4(1.0f);
@@ -179,10 +194,25 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
+        lightCubeProgram.use();
+
+        lightCubeProgram.setMat4("projection", projection);
+        lightCubeProgram.setMat4("view", view);
+
+        glm::mat4 lightModel = glm::mat4(1.0f);
+
+        lightModel = glm::translate(lightModel, lightPos);
+        lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+        lightCubeProgram.setMat4("model", lightModel);
+
+        glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
         glfwSwapBuffers(window);
     }
 
-    glDeleteVertexArrays(1, &VAO);
+    glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteVertexArrays(1, &lightVAO);
     glDeleteBuffers(1, &VBO);
     printf("Shutting down...");
     glfwTerminate();
