@@ -148,7 +148,7 @@ int main() {
     cubeFrontTexture.TexturePNG("assets/face.png", GL_LINEAR, GL_REPEAT);
 
     Shader shaderProgram("assets/cubeVertexShader.vert", "assets/cubeFragmentShader.frag");
-    Shader lightCubeProgram("assets/lightCubeVertexShader.vert", "assets/lightCubeFragmentShader.frag");
+    Shader lightProgram("assets/lightVertexShader.vert", "assets/lightFragmentShader.frag");
 
     shaderProgram.use();
 
@@ -194,16 +194,16 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        lightCubeProgram.use();
+        lightProgram.use();
 
-        lightCubeProgram.setMat4("projection", projection);
-        lightCubeProgram.setMat4("view", view);
+        lightProgram.setMat4("projection", projection);
+        lightProgram.setMat4("view", view);
 
         glm::mat4 lightModel = glm::mat4(1.0f);
 
         lightModel = glm::translate(lightModel, lightPos);
         lightModel = glm::scale(lightModel, glm::vec3(0.2f));
-        lightCubeProgram.setMat4("model", lightModel);
+        lightProgram.setMat4("model", lightModel);
 
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
