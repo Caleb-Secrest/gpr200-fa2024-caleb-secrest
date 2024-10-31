@@ -19,6 +19,8 @@ void processInput(GLFWwindow* window);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
+bool blinn = false;
+bool blinnKeyPressed = false;
 
 Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCREEN_WIDTH / 2.0f;
@@ -37,7 +39,7 @@ int main() {
         return 1;
     }
 
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Assignment Four", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Assignment Five", NULL, NULL);
     if (window == NULL) {
         printf("GLFW failed to create window");
         return 1;
@@ -193,6 +195,7 @@ int main() {
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
+        shaderProgram.setInt("blinn", blinn);
 
         lightProgram.use();
 
@@ -240,6 +243,16 @@ void processInput(GLFWwindow* window)
         cam.ProcessKeyboard(UP, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         cam.ProcessKeyboard(DOWN, deltaTime, isSprinting);
+
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !blinnKeyPressed)
+    {
+        blinn = !blinn;
+        blinnKeyPressed = true;
+    }
+    if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
+    {
+        blinnKeyPressed = false;
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
