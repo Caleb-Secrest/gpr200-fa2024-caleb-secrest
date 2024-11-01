@@ -36,7 +36,7 @@ float lastFrame = 0.0f;
 
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-float ambientStrength = 0.1f;
+float ambientStrength = 0.05f;
 float specularStrength = 0.1f;
 float diffuseStrength = 0.1f;
 float shine = 2.0f;
@@ -213,6 +213,7 @@ int main() {
         shaderProgram.setFloat("ambient", ambientStrength);
         shaderProgram.setFloat("specularStrength", specularStrength);
         shaderProgram.setFloat("diffuseStrength", diffuseStrength);
+        shaderProgram.setFloat("shine", shine);
 
         lightProgram.use();
 
@@ -224,6 +225,7 @@ int main() {
         lightModel = glm::translate(lightModel, lightPos);
         lightModel = glm::scale(lightModel, glm::vec3(0.2f));
         lightProgram.setMat4("model", lightModel);
+        lightProgram.setVec3("lightColor", lightColor);
 
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
