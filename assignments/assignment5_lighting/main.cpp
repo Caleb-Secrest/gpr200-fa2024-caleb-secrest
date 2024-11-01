@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <caleb/shader.hpp>
 #include <caleb/texture.hpp>
 #include <caleb/camera.hpp>
@@ -31,6 +35,11 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+float ambientStrength = 0.1f;
+float specularStrength = 0.1f;
+float diffuseStrength = 0.1f;
+float shine = 2.0f;
 
 int main() {
     printf("Initializing...");
@@ -57,6 +66,11 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     float vertices[] = {
        // X      Y      Z      NX     NY     NZ     U     V
@@ -171,7 +185,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaderProgram.use();
-        shaderProgram.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        shaderProgram.setVec3("lightColor", lightColor);
         shaderProgram.setVec3("lightPos", lightPos);
         shaderProgram.setVec3("viewPos", cam.Pos);
 
@@ -189,13 +203,16 @@ int main() {
         {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePos[i]);
-            model = glm::rotate(model, glm::radians(cubeRot[i]) * currentFrame, glm::vec3(1.0f, 0.3f, 0.5f));
+            model = glm::rotate(model, glm::radians(cubeRot[i]), glm::vec3(1.0f, 0.3f, 0.5f));
             model = glm::scale(model, cubeSize[i]);
             shaderProgram.setMat4("model", model);
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
         shaderProgram.setInt("blinn", blinn);
+        shaderProgram.setFloat("ambient", ambientStrength);
+        shaderProgram.setFloat("specularStrength", specularStrength);
+        shaderProgram.setFloat("diffuseStrength", diffuseStrength);
 
         lightProgram.use();
 
@@ -210,6 +227,22 @@ int main() {
 
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Settings");
+        ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
+        ImGui::ColorEdit3("Light Color", &lightColor.r);
+        ImGui::SliderFloat("Ambient Strength", &ambientStrength, 0.0f, 1.0f);
+        ImGui::SliderFloat("Specular Strength", &specularStrength, 0.0f, 1.0f);
+        ImGui::SliderFloat("Diffuse Strength", &diffuseStrength, 0.0f, 1.0f);
+        ImGui::SliderFloat("Shine Strength", &shine, 2.0f, 1024.0f);
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
@@ -252,6 +285,17 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
     {
         blinnKeyPressed = false;
+    }
+
+    if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        firstMouse = true;
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        firstMouse = false;
     }
 }
 
