@@ -30,6 +30,7 @@ Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
+bool mouseActive = false;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -292,12 +293,12 @@ void processInput(GLFWwindow* window)
     if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        firstMouse = true;
+        mouseActive = false;
     }
     else
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        firstMouse = false;
+        mouseActive = true;
     }
 }
 
@@ -308,23 +309,26 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
 {
-    float xPos = static_cast<float>(xPosIn);
-    float yPos = static_cast<float>(yPosIn);
-
-    if (firstMouse)
+    if (mouseActive)
     {
+        float xPos = static_cast<float>(xPosIn);
+        float yPos = static_cast<float>(yPosIn);
+
+        if (firstMouse)
+        {
+            lastX = xPos;
+            lastY = yPos;
+            firstMouse = false;
+        }
+
+        float xOffSet = xPos - lastX;
+        float yOffSet = lastY - yPos;
+
         lastX = xPos;
         lastY = yPos;
-        firstMouse = false;
+
+        cam.ProcessMouseMovement(xOffSet, yOffSet);
     }
-
-    float xOffSet = xPos - lastX;
-    float yOffSet = lastY - yPos;
-
-    lastX = xPos;
-    lastY = yPos;
-
-    cam.ProcessMouseMovement(xOffSet, yOffSet);
 }
 
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet)
