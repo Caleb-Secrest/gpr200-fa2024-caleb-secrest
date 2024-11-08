@@ -16,7 +16,7 @@ ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/)
 
 install(FILES ${FINALPROJECT_INC} DESTINATION include/finalProject)
 add_executable(finalProject ${FINALPROJECT_SRC} ${FINALPROJECT_INC})
-target_link_libraries(finalProject PUBLIC core IMGUI glm)
+target_link_libraries(finalProject PUBLIC core IMGUI glm assimp)
 target_include_directories(finalProject PUBLIC ${CORE_INC_DIR} ${stb_INCLUDE_DIR})
 
 #Trigger asset copy when finalProject is built

@@ -49,7 +49,7 @@ int main() {
         return 1;
     }
 
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Assignment Five", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Final Project: High Seas", NULL, NULL);
     if (window == NULL) {
         printf("GLFW failed to create window");
         return 1;
