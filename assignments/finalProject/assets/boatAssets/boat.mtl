@@ -1,0 +1,50 @@
+newmtl %EF%BA%94%EF%BB%A3%EF%BA%8E%EF%BA%A7%2E004
+illum 7
+Kd 0.735357 0.735357 0.735357
+adobe_interior_color 1 1 1
+Ni 1.5
+adobe_density 0
+Tr 0
+d 1
+Ka 0 0 0
+Ke 0 0 0
+Pm 0
+adobe_translucence 0
+Pr 0.272166
+Ns 16
+Ks 1 1 1
+map_Kd boat/%EF%BA%94%EF%BB%A3%EF%BA%8E%EF%BA%A7%2E004_base_color.png
+
+newmtl %EF%BA%94%EF%BB%A3%EF%BA%8E%EF%BA%A7%2E006
+illum 7
+Kd 0.735357 0.735357 0.735357
+adobe_interior_color 1 1 1
+Ni 1.5
+adobe_density 0
+Tr 0
+d 1
+Ka 0 0 0
+Ke 0 0 0
+Pm 0
+adobe_translucence 0
+Pr 0.272166
+Ns 16
+Ks 1 1 1
+map_Kd boat/%EF%BA%94%EF%BB%A3%EF%BA%8E%EF%BA%A7%2E006_base_color.png
+
+newmtl %EF%BA%94%EF%BB%A3%EF%BA%8E%EF%BA%A7%2E005
+illum 7
+Kd 0.735357 0.735357 0.735357
+adobe_interior_color 1 1 1
+Ni 1.5
+adobe_density 0
+Tr 0
+d 1
+Ka 0 0 0
+Ke 0 0 0
+Pm 0
+adobe_translucence 0
+Pr 0.272166
+Ns 16
+Ks 1 1 1
+map_Kd boat/%EF%BA%94%EF%BB%A3%EF%BA%8E%EF%BA%A7%2E005_base_color.png
