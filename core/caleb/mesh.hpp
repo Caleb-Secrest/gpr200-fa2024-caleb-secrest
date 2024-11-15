@@ -2,9 +2,10 @@
 #define MESH_H
 
 #include "../ew/external/glad.h"
-#include "../glm/glm.hpp"
-#include "../glm/gtc/matrix_transform.hpp"
 #include "shader.hpp"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
 #include <vector>
