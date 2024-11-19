@@ -16,7 +16,7 @@ struct Vertex
 {
     glm::vec3 Pos;
     glm::vec3 Norm;
-    glm::vec3 TexCoords;
+    glm::vec2 TexCoords;
     glm::vec3 Tang;
     glm::vec3 Bitang;
     int m_BoneIDs[MAX_BONE_INFLUENCE];
