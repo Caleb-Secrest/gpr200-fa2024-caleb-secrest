@@ -12,7 +12,7 @@
 
 #define MAX_BONE_INFLUENCE 4
 
-struct Vertex
+struct MeshVertex
 {
     glm::vec3 Pos;
     glm::vec3 Norm;
@@ -23,7 +23,7 @@ struct Vertex
     float m_Weights[MAX_BONE_INFLUENCE];
 };
 
-struct Texture
+struct MeshTexture
 {
     unsigned int id;
     std::string type;
@@ -38,12 +38,12 @@ private:
     void SetupMesh();
 
 public:
-    std::vector<Vertex> verts;
+    std::vector<MeshVertex> verts;
     std::vector<unsigned int> indices;
-    std::vector<Texture> texts;
+    std::vector<MeshTexture> texts;
     unsigned int VAO;
 
-    Mesh(std::vector<Vertex> verts, std::vector<unsigned int> indices, std::vector<Texture> texts);
+    Mesh(std::vector<MeshVertex> verts, std::vector<unsigned int> indices, std::vector<MeshTexture> texts);
 
     void Draw(Shader& shader);
 
