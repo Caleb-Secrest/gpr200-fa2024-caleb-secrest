@@ -183,8 +183,8 @@ int main() {
 
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
-    Shader boatShader("boatVertexShader.vert", "boatFragmentShader.frag");
-    Model boatModel("assets/boatAssets/boat.obj");
+    Shader boatShader("assets/boatVertexShader.vert", "assets/boatFragmentShader.frag");
+    Model boatModel("assets/backpack/backpack.obj");
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
