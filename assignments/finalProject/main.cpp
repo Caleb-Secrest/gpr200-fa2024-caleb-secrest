@@ -265,7 +265,7 @@ int main() {
 
         glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = cam.GetViewMatrix();
-        boatShader.setMat4("projection", projection);
+        boatShader.setMat4("proj", projection);
         boatShader.setMat4("view", view);
 
         glm::mat4 model = glm::mat4(1.0f);
