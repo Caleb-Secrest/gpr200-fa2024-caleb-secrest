@@ -1,3 +1,5 @@
+/*Shader Class Written by Caleb using OpenGL Tutorials*/
+
 #ifndef SHADER_H
 #define SHADER_H
 

@@ -1,3 +1,5 @@
+/*Model Class Written by Caleb using Assimp and OpenGL Tutorials*/
+
 #ifndef MODEL_H
 #define MODEL_H
 

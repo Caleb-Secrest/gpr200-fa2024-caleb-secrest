@@ -1,3 +1,5 @@
+/*Camera Class Written by Caleb using OpenGL Tutorials*/
+
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 

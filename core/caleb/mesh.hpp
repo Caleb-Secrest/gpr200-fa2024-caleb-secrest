@@ -1,3 +1,5 @@
+/*Mesh Class Written by Caleb using Assimp and OpenGL Tutorials*/
+
 #ifndef MESH_H
 #define MESH_H
 

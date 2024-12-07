@@ -1,3 +1,5 @@
+/*Texture Class Written by Caleb using OpenGL Tutorials*/
+
 #ifndef TEXTURE_HPP
 #define TEXTURE_HPP
 

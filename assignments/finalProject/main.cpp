@@ -1,3 +1,16 @@
+// BOAT MODEL LICENSE
+/*Model Information:
+* title:	Gislinge Viking Boat
+* source:	https://sketchfab.com/3d-models/gislinge-viking-boat-01098ad7973647a9b558f41d2ebc5193
+* author:	Opus Poly (https://sketchfab.com/OpusPoly)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Gislinge Viking Boat" (https://sketchfab.com/3d-models/gislinge-viking-boat-01098ad7973647a9b558f41d2ebc5193) by Opus Poly (https://sketchfab.com/OpusPoly) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)*/
+
 #include <stdio.h>
 #include <iostream>
 
@@ -35,6 +48,11 @@ bool mouseActive = false;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+float boatScale = 0.125f;
+
+float rockingIntensity = 1.0f;
+float rockingAngle = 0.0f;
 
 //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 //glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -184,7 +202,7 @@ int main() {
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
     Shader boatShader("assets/boatVertexShader.vert", "assets/boatFragmentShader.frag");
-    Model boatModel("assets/boatAssets/Viking_Longboat.obj");
+    Model boatModel("assets/boatAssets/boat.obj");
 
     // Render loop
     while (!glfwWindowShouldClose(window)) {
@@ -193,6 +211,8 @@ int main() {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+
+        rockingAngle = rockingIntensity * sin(currentFrame);
 
         processInput(window);
 
@@ -270,7 +290,8 @@ int main() {
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        model = glm::rotate(model, glm::radians(rockingAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(boatScale, boatScale, boatScale));
         boatShader.setMat4("model", model);
         boatModel.Draw(boatShader);
 
@@ -285,6 +306,7 @@ int main() {
     return 0;
 }
 
+// Written by Caleb using OpenGL Tutorial
 void processInput(GLFWwindow* window)
 {
     bool isSprinting = false;
@@ -329,11 +351,13 @@ void processInput(GLFWwindow* window)
     }
 }
 
+// Written by Caleb using OpenGL Tutorial
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
+// Written by Caleb using OpenGL Tutorial
 void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
 {
     if (mouseActive)
@@ -358,6 +382,7 @@ void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
     }
 }
 
+// Written by Caleb using OpenGL Tutorial
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet)
 {
     cam.ProcessMouseScroll(static_cast<float>(yOffSet));
