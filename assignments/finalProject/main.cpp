@@ -11,6 +11,9 @@ Model License:
 If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
 This work is based on "Gislinge Viking Boat" (https://sketchfab.com/3d-models/gislinge-viking-boat-01098ad7973647a9b558f41d2ebc5193) by Opus Poly (https://sketchfab.com/OpusPoly) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)*/
 
+// CUBEMAP SOURCE
+// https://opengameart.org/content/sky-box-sunny-day
+
 #include <stdio.h>
 #include <iostream>
 
@@ -35,6 +38,9 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos);
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet);
 void processInput(GLFWwindow* window);
 
+unsigned int loadTexture(const char* path);
+unsigned int loadCubemap(std::vector<std::string> faces);
+
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 //bool blinn = false;
@@ -51,7 +57,7 @@ float lastFrame = 0.0f;
 
 float boatScale = 0.125f;
 
-float rockingIntensity = 1.0f;
+float rockingIntensity = 2.0f;
 float rockingAngle = 0.0f;
 
 //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
@@ -93,112 +99,84 @@ int main() {
         return 1;
     }
 
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     //IMGUI_CHECKVERSION();
     //ImGui::CreateContext();
     //ImGui_ImplGlfw_InitForOpenGL(window, true);
     //ImGui_ImplOpenGL3_Init();
 
-    //float vertices[] = {
-    //   // X      Y      Z      NX     NY     NZ     U     V
-    //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-    //     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-    //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-    //     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-    //    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-    //    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+    // Cubemap Writen by Caleb using OpnelGL Tutorials
+    Shader skyboxShader("assets/skyboxVertexShader.vert", "assets/skyboxFragmentShader.frag");
 
-    //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
-    //     0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,
-    //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-    //     0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,
+    float cubemapVerts[] = {
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-    //    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-    //    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-    //    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    //    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    //    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-    //    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-    //     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-    //     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-    //     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    //     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    //     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-    //     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
 
-    //    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-    //     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-    //     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-    //     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-    //    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-    //    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-    //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-    //     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-    //     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-    //     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-    //    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-    //    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-    //};
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-    //const int cubeCount = 20;
-    //glm::vec3 cubePos[cubeCount];
-    //float cubeRot[cubeCount];
-    //glm::vec3 cubeSize[cubeCount];
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
 
-    //for (unsigned int i = 0; i < cubeCount; i++)
-    //{
-    //    float cubeScale = ew::RandomRange(0.25f, 3.0f);
+    unsigned int cubemapVAO, cubemapVBO;
+    glGenVertexArrays(1, &cubemapVAO);
+    glGenBuffers(1, &cubemapVBO);
+    glBindVertexArray(cubemapVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubemapVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubemapVerts), &cubemapVerts, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-    //    cubePos[i] = glm::vec3(ew::RandomRange(-10.0f, 10.0f), ew::RandomRange(-10.0f, 10.0f), ew::RandomRange(-10.0f, 10.0f));
-    //    cubeRot[i] = ew::RandomRange(0.0f, 360.0f);
-    //    cubeSize[i] = glm::vec3(cubeScale, cubeScale, cubeScale);
-    //}
+    std::vector<std::string> cubeFaces
+    {
+        "assets/cubemap/right.jpg",
+        "assets/cubemap/left.jpg",
+        "assets/cubemap/top.jpg",
+        "assets/cubemap/bottom.jpg",
+        "assets/cubemap/front.jpg",
+        "assets/cubemap/back.jpg"
+    };
+    unsigned int cubemapTexture = loadCubemap(cubeFaces);
 
-    //unsigned int cubeVAO, VBO;
-    //glGenVertexArrays(1, &cubeVAO);
-    //glGenBuffers(1, &VBO);
+    skyboxShader.use();
+    skyboxShader.setInt("cubemap", 0);
 
-    //glBindVertexArray(cubeVAO);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-
-    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    //glEnableVertexAttribArray(2);
-
-    //unsigned int lightVAO;
-    //glGenVertexArrays(1, &lightVAO);
-    //glBindVertexArray(lightVAO);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-
-    //Texture cubeBackTexture, cubeFrontTexture;
-
-    //cubeBackTexture.TextureJPG("assets/checkerboard.jpg", GL_LINEAR, GL_REPEAT);
-    //cubeFrontTexture.TexturePNG("assets/face.png", GL_LINEAR, GL_REPEAT);
-
-    //Shader shaderProgram("assets/cubeVertexShader.vert", "assets/cubeFragmentShader.frag");
-    //Shader lightProgram("assets/lightVertexShader.vert", "assets/lightFragmentShader.frag");
-
-    //shaderProgram.use();
-
-    //shaderProgram.setInt("texture1", 0);
-    //shaderProgram.setInt("texture2", 1);
-
+    // 3D Model Written by Caleb using OpenGL
     stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
     Shader boatShader("assets/boatVertexShader.vert", "assets/boatFragmentShader.frag");
@@ -219,31 +197,7 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /*shaderProgram.use();
-        shaderProgram.setVec3("lightColor", lightColor);
-        shaderProgram.setVec3("lightPos", lightPos);
-        shaderProgram.setVec3("viewPos", cam.Pos);
-
-        cubeBackTexture.Bind(0);
-        cubeFrontTexture.Bind(1);
-
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 1000.0f);
-        shaderProgram.setMat4("projection", projection);
-
-        glm::mat4 view = cam.GetViewMatrix();
-        shaderProgram.setMat4("view", view);
-
-        glBindVertexArray(cubeVAO);
-        for (unsigned int i = 0; i < cubeCount; i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePos[i]);
-            model = glm::rotate(model, glm::radians(cubeRot[i]), glm::vec3(1.0f, 0.3f, 0.5f));
-            model = glm::scale(model, cubeSize[i]);
-            shaderProgram.setMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        /*
         shaderProgram.setInt("blinn", blinn);
         shaderProgram.setFloat("ambient", ambientStrength);
         shaderProgram.setFloat("specularStrength", specularStrength);
@@ -283,24 +237,37 @@ int main() {
 
         boatShader.use();
 
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = cam.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
         boatShader.setMat4("proj", projection);
         boatShader.setMat4("view", view);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(rockingAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(boatScale, boatScale, boatScale));
-        boatShader.setMat4("model", model);
+        glm::mat4 boatVertModel = glm::mat4(1.0f);
+        boatVertModel = glm::translate(boatVertModel, glm::vec3(0.0f, 0.0f, 0.0f));
+        boatVertModel = glm::rotate(boatVertModel, glm::radians(rockingAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+        boatVertModel = glm::scale(boatVertModel, glm::vec3(boatScale, boatScale, boatScale));
+        boatShader.setMat4("model", boatVertModel);
         boatModel.Draw(boatShader);
+
+        glDepthFunc(GL_LEQUAL);
+        skyboxShader.use();
+        glm::mat4 cubemapView = glm::mat4(glm::mat3(cam.GetViewMatrix()));
+        glm::mat4 cubemapProjection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+        skyboxShader.setMat4("view", cubemapView);
+        skyboxShader.setMat4("proj", cubemapProjection);
+
+        glBindVertexArray(cubemapVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS);
 
         glfwSwapBuffers(window);
     }
 
-    /*glDeleteVertexArrays(1, &cubeVAO);
-    glDeleteVertexArrays(1, &lightVAO);
-    glDeleteBuffers(1, &VBO);*/
+    glDeleteVertexArrays(1, &cubemapVAO);
+    glDeleteVertexArrays(1, &cubemapVBO);
     printf("Shutting down...");
     glfwTerminate();
     return 0;
@@ -386,4 +353,73 @@ void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet)
 {
     cam.ProcessMouseScroll(static_cast<float>(yOffSet));
+}
+
+// Written by Caleb using OpenGL Tutorial
+unsigned int loadTexture(char const* path)
+{
+    unsigned int textID;
+    glGenTextures(1, &textID);
+
+    int width, height, nrComps;
+    unsigned char* data = stbi_load(path, &width, &height, &nrComps, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComps == 1)
+            format = GL_RED;
+        else if (nrComps == 3)
+            format = GL_RGB;
+        else if (nrComps == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textID;
+}
+
+// Written by Caleb using OpenGL Tutorial
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+    unsigned int textID;
+    glGenTextures(1, &textID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textID);
+
+    int width, height, nrComps;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrComps, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textID;
 }
