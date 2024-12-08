@@ -39,7 +39,7 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
-
+// Written by Caleb using OpenGL Tutorial
 Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
@@ -152,7 +152,7 @@ int main() {
         glm::mat4 view = cam.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 
-        // Render ocean floor
+        // Render ocean floor by JP
         floorShader.use();
         floorShader.setMat4("proj", projection);
         floorShader.setMat4("view", view);
@@ -164,7 +164,7 @@ int main() {
         glBindVertexArray(floorVAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-        // Render boat model
+        //Written by Caleb using OpenGL Tutorial
         boatShader.use();
         boatShader.setMat4("proj", projection);
         boatShader.setMat4("view", view);
@@ -172,7 +172,7 @@ int main() {
         boatShader.setFloat("scale", boatScale);
         boatModel.Draw(boatShader);
 
-        // Render skybox
+        // Written by Caleb using OpenGL Tutorial
         glDepthFunc(GL_LEQUAL); // Change depth function so skybox isn't obscured
         skyboxShader.use();
         skyboxShader.setMat4("view", glm::mat4(glm::mat3(view))); // Remove translation part of view matrix
@@ -188,7 +188,7 @@ int main() {
     glfwTerminate();
     return 0;
 }
-
+// Written by Caleb using OpenGL Tutorial
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
@@ -211,7 +211,7 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet) {
     cam.ProcessMouseScroll(static_cast<float>(yOffSet));
 }
-
+// Written by Caleb using OpenGL Tutorial
 void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cam.ProcessKeyboard(FORWARD, deltaTime);
@@ -222,7 +222,7 @@ void processInput(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         cam.ProcessKeyboard(RIGHT, deltaTime);
 }
-
+// Written by Caleb using OpenGL Tutorial
 unsigned int loadTexture(const char* path) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -236,7 +236,7 @@ unsigned int loadTexture(const char* path) {
     stbi_image_free(data);
     return textureID;
 }
-
+// Written by Caleb using OpenGL Tutorial
 unsigned int loadCubemap(std::vector<std::string> faces) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
