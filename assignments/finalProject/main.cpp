@@ -39,6 +39,7 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
+
 // Written by Caleb using OpenGL Tutorial
 Camera cam(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCREEN_WIDTH / 2.0f;
@@ -49,9 +50,14 @@ bool mouseActive = false;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+bool boatActive = true;
 float boatScale = 0.125f;
-float rockingIntensity = 2.0f;
+float rockingAngleIntensity = 2.0f;
+float rockingHeightIntensity = 2.0f;
 float rockingAngle = 0.0f;
+float rockingHeight = 0.0f;
+
+bool cubemapActive = true;
 
 int main() {
     printf("Initializing...");
@@ -85,6 +91,11 @@ int main() {
     }
 
     glEnable(GL_DEPTH_TEST);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     Shader skyboxShader("assets/skyboxVertexShader.vert", "assets/skyboxFragmentShader.frag");
 
@@ -142,7 +153,8 @@ int main() {
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        rockingAngle = rockingIntensity * sin(currentFrame);
+        rockingAngle = rockingAngleIntensity * sin(currentFrame);
+        rockingHeight = (rockingHeightIntensity * sin(currentFrame)) / 100.0f;
 
         processInput(window);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -165,22 +177,48 @@ int main() {
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
         //Written by Caleb using OpenGL Tutorial
-        boatShader.use();
-        boatShader.setMat4("proj", projection);
-        boatShader.setMat4("view", view);
-        boatShader.setMat4("model", glm::rotate(glm::mat4(1.0f), glm::radians(rockingAngle), glm::vec3(0.0f, 1.0f, 0.0f)));
-        boatShader.setFloat("scale", boatScale);
-        boatModel.Draw(boatShader);
+        if (boatActive)
+        {
+            boatShader.use();
+            glm::mat4 view = cam.GetViewMatrix();
+            glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+            boatShader.setMat4("proj", projection);
+            boatShader.setMat4("view", view);
+            glm::mat4 boatVertModel = glm::mat4(1.0f);
+            boatVertModel = glm::translate(boatVertModel, glm::vec3(0.0f, -(rockingHeight), 0.0f));
+            boatVertModel = glm::rotate(boatVertModel, glm::radians(rockingAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+            boatVertModel = glm::scale(boatVertModel, glm::vec3(boatScale, boatScale, boatScale));
+            boatShader.setMat4("model", boatVertModel);
+            boatModel.Draw(boatShader);
+        }
 
         // Written by Caleb using OpenGL Tutorial
-        glDepthFunc(GL_LEQUAL); // Change depth function so skybox isn't obscured
-        skyboxShader.use();
-        skyboxShader.setMat4("view", glm::mat4(glm::mat3(view))); // Remove translation part of view matrix
-        skyboxShader.setMat4("proj", projection);
-        glBindVertexArray(cubemapVAO);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDepthFunc(GL_LESS); // Reset depth function
+        if (cubemapActive)
+        {
+            glDepthFunc(GL_LEQUAL);
+            skyboxShader.use();
+            skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
+            skyboxShader.setMat4("proj", projection);
+            glBindVertexArray(cubemapVAO);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDepthFunc(GL_LESS);
+        }
+
+        ImGui_ImplGlfw_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui::NewFrame();
+
+        // Boat & Cubemap Settings Written by Caleb
+        ImGui::Begin("Settings");
+        ImGui::Checkbox("Boat", &boatActive);
+        ImGui::SliderFloat("Boat Rock Angle Intensity", &rockingAngleIntensity, 0.25f, 50.0f);
+        ImGui::SliderFloat("Boat Rock Height Intensity", &rockingHeightIntensity, 0.25f, 250.0f);
+        ImGui::Checkbox("Cubemap", &cubemapActive);
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
@@ -205,7 +243,8 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     lastX = static_cast<float>(xPos);
     lastY = static_cast<float>(yPos);
 
-    cam.ProcessMouseMovement(xOffset, yOffset);
+    if (mouseActive)
+        cam.ProcessMouseMovement(xOffset, yOffset);
 }
 
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet) {
@@ -213,15 +252,38 @@ void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet) {
 }
 // Written by Caleb using OpenGL Tutorial
 void processInput(GLFWwindow* window) {
+    bool isSprinting = false;
+
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        isSprinting = true;
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cam.ProcessKeyboard(FORWARD, deltaTime);
+        cam.ProcessKeyboard(FORWARD, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cam.ProcessKeyboard(BACKWARD, deltaTime);
+        cam.ProcessKeyboard(BACKWARD, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cam.ProcessKeyboard(LEFT, deltaTime);
+        cam.ProcessKeyboard(LEFT, deltaTime, isSprinting);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cam.ProcessKeyboard(RIGHT, deltaTime);
+        cam.ProcessKeyboard(RIGHT, deltaTime, isSprinting);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        cam.ProcessKeyboard(UP, deltaTime, isSprinting);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        cam.ProcessKeyboard(DOWN, deltaTime, isSprinting);
+
+    if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2))
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        mouseActive = false;
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        mouseActive = true;
+    }
 }
+
 // Written by Caleb using OpenGL Tutorial
 unsigned int loadTexture(const char* path) {
     unsigned int textureID;
@@ -236,6 +298,7 @@ unsigned int loadTexture(const char* path) {
     stbi_image_free(data);
     return textureID;
 }
+
 // Written by Caleb using OpenGL Tutorial
 unsigned int loadCubemap(std::vector<std::string> faces) {
     unsigned int textureID;
