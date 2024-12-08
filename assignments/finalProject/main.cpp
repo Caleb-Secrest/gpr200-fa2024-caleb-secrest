@@ -55,10 +55,15 @@ bool mouseActive = false;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+bool boatActive = true;
 float boatScale = 0.125f;
 
-float rockingIntensity = 2.0f;
+float rockingAngleIntensity = 2.0f;
+float rockingHeightIntensity = 2.0f;
 float rockingAngle = 0.0f;
+float rockingHeight = 0.0f;
+
+bool cubemapActive = true;
 
 //glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 //glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
@@ -101,10 +106,10 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    //IMGUI_CHECKVERSION();
-    //ImGui::CreateContext();
-    //ImGui_ImplGlfw_InitForOpenGL(window, true);
-    //ImGui_ImplOpenGL3_Init();
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     // Cubemap Writen by Caleb using OpnelGL Tutorials
     Shader skyboxShader("assets/skyboxVertexShader.vert", "assets/skyboxFragmentShader.frag");
@@ -190,7 +195,9 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        rockingAngle = rockingIntensity * sin(currentFrame);
+        // Boat Physics Written by Caleb
+        rockingAngle = rockingAngleIntensity * sin(currentFrame);
+        rockingHeight = (rockingHeightIntensity * sin(currentFrame)) / 100.0f;
 
         processInput(window);
 
@@ -217,51 +224,58 @@ int main() {
         lightProgram.setVec3("lightColor", lightColor);
 
         glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 0, 36);*/
+
+        // Boat Toggle Written by Caleb
+        if (boatActive)
+        {
+            boatShader.use();
+
+            glm::mat4 view = cam.GetViewMatrix();
+            glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+            boatShader.setMat4("proj", projection);
+            boatShader.setMat4("view", view);
+
+            glm::mat4 boatVertModel = glm::mat4(1.0f);
+            boatVertModel = glm::translate(boatVertModel, glm::vec3(0.0f, -(rockingHeight), 0.0f));
+            boatVertModel = glm::rotate(boatVertModel, glm::radians(rockingAngle), glm::vec3(1.0f, 0.0f, 0.0f));
+            boatVertModel = glm::scale(boatVertModel, glm::vec3(boatScale, boatScale, boatScale));
+            boatShader.setMat4("model", boatVertModel);
+            boatModel.Draw(boatShader);
+        }
+
+        // Cubemap Toggle Writtn by Caleb
+        if (cubemapActive)
+        {
+            glDepthFunc(GL_LEQUAL);
+            skyboxShader.use();
+            glm::mat4 cubemapView = glm::mat4(glm::mat3(cam.GetViewMatrix()));
+            glm::mat4 cubemapProjection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+            skyboxShader.setMat4("view", cubemapView);
+            skyboxShader.setMat4("proj", cubemapProjection);
+
+            glBindVertexArray(cubemapVAO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
+            glDepthFunc(GL_LESS);
+        }
 
         ImGui_ImplGlfw_NewFrame();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui::NewFrame();
 
+        // Boat & Cubemap Settings Written by Caleb
         ImGui::Begin("Settings");
-        ImGui::DragFloat3("Light Position", &lightPos.x, 0.1f);
-        ImGui::ColorEdit3("Light Color", &lightColor.r);
-        ImGui::SliderFloat("Ambient Strength", &ambientStrength, 0.0f, 1.0f);
-        ImGui::SliderFloat("Specular Strength", &specularStrength, 0.0f, 1.0f);
-        ImGui::SliderFloat("Diffuse Strength", &diffuseStrength, 0.0f, 1.0f);
-        ImGui::SliderFloat("Shine Strength", &shine, 2.0f, 1024.0f);
+        ImGui::Checkbox("Boat", &boatActive);
+        ImGui::SliderFloat("Boat Rock Angle Intensity", &rockingAngleIntensity, 0.25f, 50.0f);
+        ImGui::SliderFloat("Boat Rock Height Intensity", &rockingHeightIntensity, 0.25f, 250.0f);
+        ImGui::Checkbox("Cubemap", &cubemapActive);
         ImGui::End();
 
         ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
-
-        boatShader.use();
-
-        glm::mat4 view = cam.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-        boatShader.setMat4("proj", projection);
-        boatShader.setMat4("view", view);
-
-        glm::mat4 boatVertModel = glm::mat4(1.0f);
-        boatVertModel = glm::translate(boatVertModel, glm::vec3(0.0f, 0.0f, 0.0f));
-        boatVertModel = glm::rotate(boatVertModel, glm::radians(rockingAngle), glm::vec3(1.0f, 0.0f, 0.0f));
-        boatVertModel = glm::scale(boatVertModel, glm::vec3(boatScale, boatScale, boatScale));
-        boatShader.setMat4("model", boatVertModel);
-        boatModel.Draw(boatShader);
-
-        glDepthFunc(GL_LEQUAL);
-        skyboxShader.use();
-        glm::mat4 cubemapView = glm::mat4(glm::mat3(cam.GetViewMatrix()));
-        glm::mat4 cubemapProjection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
-        skyboxShader.setMat4("view", cubemapView);
-        skyboxShader.setMat4("proj", cubemapProjection);
-
-        glBindVertexArray(cubemapVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
@@ -327,24 +341,24 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // Written by Caleb using OpenGL Tutorial
 void mouse_callback(GLFWwindow* window, double xPosIn, double yPosIn)
 {
-    if (mouseActive)
+    float xPos = static_cast<float>(xPosIn);
+    float yPos = static_cast<float>(yPosIn);
+
+    if (firstMouse)
     {
-        float xPos = static_cast<float>(xPosIn);
-        float yPos = static_cast<float>(yPosIn);
-
-        if (firstMouse)
-        {
-            lastX = xPos;
-            lastY = yPos;
-            firstMouse = false;
-        }
-
-        float xOffSet = xPos - lastX;
-        float yOffSet = lastY - yPos;
-
         lastX = xPos;
         lastY = yPos;
+        firstMouse = false;
+    }
 
+    float xOffSet = xPos - lastX;
+    float yOffSet = lastY - yPos;
+
+    lastX = xPos;
+    lastY = yPos;
+
+    if (mouseActive)
+    {
         cam.ProcessMouseMovement(xOffSet, yOffSet);
     }
 }
