@@ -97,11 +97,51 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
 
+    // Cubemap Written by Caleb using OpenGL Tutorials
     Shader skyboxShader("assets/skyboxVertexShader.vert", "assets/skyboxFragmentShader.frag");
 
     float cubemapVerts[] = {
-        -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
     };
     unsigned int cubemapVAO, cubemapVBO;
     glGenVertexArrays(1, &cubemapVAO);
@@ -230,11 +270,13 @@ int main() {
     glfwTerminate();
     return 0;
 }
+
 // Written by Caleb using OpenGL Tutorial
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// Written by Caleb using OpenGL Tutorial
 void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
     if (firstMouse) {
         lastX = static_cast<float>(xPos);
@@ -251,9 +293,11 @@ void mouse_callback(GLFWwindow* window, double xPos, double yPos) {
         cam.ProcessMouseMovement(xOffset, yOffset);
 }
 
+// Written by Caleb using OpenGL Tutorial
 void scroll_callback(GLFWwindow* window, double xOffSet, double yOffSet) {
     cam.ProcessMouseScroll(static_cast<float>(yOffSet));
 }
+
 // Written by Caleb using OpenGL Tutorial
 void processInput(GLFWwindow* window) {
     bool isSprinting = false;
