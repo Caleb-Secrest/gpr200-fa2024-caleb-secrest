@@ -197,11 +197,15 @@ int main() {
         {
             glDepthFunc(GL_LEQUAL);
             skyboxShader.use();
-            skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
-            skyboxShader.setMat4("proj", projection);
+            glm::mat4 cubemapView = glm::mat4(glm::mat3(cam.GetViewMatrix()));
+            glm::mat4 cubemapProjection = glm::perspective(glm::radians(cam.Zoom), (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
+            skyboxShader.setMat4("view", cubemapView);
+            skyboxShader.setMat4("proj", cubemapProjection);
             glBindVertexArray(cubemapVAO);
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
             glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindVertexArray(0);
             glDepthFunc(GL_LESS);
         }
 
