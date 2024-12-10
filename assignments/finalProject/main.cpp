@@ -169,12 +169,13 @@ int main() {
     Shader floorShader("assets/oceanVertexShader.vert", "assets/oceanFragmentShader.frag");
     unsigned int floorTexture = loadTexture("assets/ocean_floor_texture.jpg");
     float floorVertices[] = {
-        // positions          // texture coordinates
-        -500.0f, -2.0f,  500.0f,  0.0f, 0.0f,
-         500.0f, -2.0f,  500.0f,  1.0f, 0.0f,
-         500.0f, -2.0f, -500.0f,  1.0f, 1.0f,
-        -500.0f, -2.0f, -500.0f,  0.0f, 1.0f
-    };
+    // positions           // texture coordinates
+    -10.0f, 4.0f,  10.0f,  0.0f, 0.0f, 
+     10.0f, 4.0f,  10.0f,  1.0f, 0.0f,
+     10.0f, 4.0f, -10.0f,  1.0f, 1.0f,
+    -10.0f, 4.0f, -10.0f,  0.0f, 1.0f
+};
+
     unsigned int floorVAO, floorVBO;
     glGenVertexArrays(1, &floorVAO);
     glGenBuffers(1, &floorVBO);
@@ -211,7 +212,7 @@ int main() {
         floorShader.setInt("floorTexture", 0);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         glm::mat4 floorModel = glm::mat4(1.0f);
-        floorModel = glm::translate(floorModel, glm::vec3(0.0f, -2.0f, 0.0f));
+        floorModel = glm::translate(floorModel, glm::vec3(0.0f, -0.25f - rockingHeight, 0.0f));
         floorShader.setMat4("model", floorModel);
         glBindVertexArray(floorVAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
