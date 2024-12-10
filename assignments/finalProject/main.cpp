@@ -217,6 +217,10 @@ int main() {
         glBindVertexArray(floorVAO);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+
+ 
+
+
         //Written by Caleb using OpenGL Tutorial
         if (boatActive)
         {
