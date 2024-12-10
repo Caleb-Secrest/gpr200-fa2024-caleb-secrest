@@ -166,7 +166,7 @@ int main() {
     Model boatModel("assets/boatAssets/boat.obj");
 
     // Ocean floor setup
-    Shader floorShader("assets/floorVertexShader.vert", "assets/floorFragmentShader.frag");
+    Shader floorShader("assets/oceanVertexShader.vert", "assets/oceanFragmentShader.frag");
     unsigned int floorTexture = loadTexture("assets/ocean_floor_texture.jpg");
     float floorVertices[] = {
         // positions          // texture coordinates
@@ -206,7 +206,7 @@ int main() {
 
         // Render ocean floor by JP
         floorShader.use();
-        floorShader.setMat4("proj", projection);
+        floorShader.setMat4("projection", projection);
         floorShader.setMat4("view", view);
         floorShader.setInt("floorTexture", 0);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
